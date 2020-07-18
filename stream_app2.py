@@ -6,7 +6,7 @@ def logistic(r, x):
     return r * x * (1 - x)
 
 
-def plot_system(r, x0, n, ax=None):
+def plot_system(r, x0, n):
     """
     Method to generate the logistic plot with step 
 
@@ -20,36 +20,46 @@ def plot_system(r, x0, n, ax=None):
     """
     # Plot the function and the
     # y=x diagonal line.
+    """
+    imput parameter:
+        r: Coefficient for logistic map
+        x0: input x for logistic map
+        n: Max iteration 
+    output:
+       1. Return Logistic map plot
+       2. Return xt(log function) vs t(time) plot
+    """
+    fig, (ax1,ax2) = plt.subplots(1, 2, figsize=(8, 4))
     t = np.linspace(0, 1)
-    ax.plot(t, logistic(r, t), 'k', lw=2)
-    ax.plot([0, 1], [0, 1], 'k', lw=2)
-
-    # Recursively apply y=f(x) and plot two lines:
-    # (x, x) -> (x, y)
-    # (x, y) -> (y, y)
+    ax1.plot(t, logistic(r, t), 'k', lw=2)
+    ax1.plot([0, 1], [0, 1], 'k', lw=2)
     x = x0
+    time= []
+    xt = []
     for i in range(n):
         y = logistic(r, x)
         # Plot the two lines.
-        ax.plot([x, x], [x, y], 'k', lw=1)
-        ax.plot([x, y], [y, y], 'k', lw=1)
+        ax1.plot([x, x], [x, y], 'k', lw=1)
+        ax1.plot([x, y], [y, y], 'k', lw=1)
         # Plot the positions with increasing
         # opacity.
-        ax.plot([x], [y], 'ok', ms=10,
+        ax1.plot([x], [y], 'ok', ms=10,
                 alpha=(i + 1) / n)
         x = y
+        time.append(i)
+        xt.append(x)
 
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1*(r/2.5))
-    ax.set_title(f"$r={r:.1f}, \, x_0={x0:.1f}$")
+    ax1.set_xlim(0, 1)
+    ax1.set_ylim(0, 1)
+    ax1.set_title(f"$r={r:.1f}, \, x_0={x0:.1f}$")
+    ax2.plot(time,xt,'ok',alpha=0.6)
+    ax2.plot(time,xt,'k',lw=2)
+    ax2.set_ylim(0, 1)
+    ax2.set_xlim(0, n)
+    ax2.set_title(f"$r={r:.1f}, \, x_0={x0:.1f}$")
+    st.pyplot()
 
-def comp_map(r1,n1):
-	fig, ax1 = plt.subplots(1, 1, figsize=(9, 6),sharey=True)
-	plot_system(r1, .1, n1, ax=ax1)
-	#plot_system(r2, .1, n2, ax=ax2)
-	st.pyplot()
-
-	return 
+    return
 
 def bifurcation_map(n,range1,range2,iterations,last):
     """
@@ -94,21 +104,21 @@ def bifurcation_map(n,range1,range2,iterations,last):
 if __name__ == "__main__":
     #method_option = st.sidebar.selectbox("Choose a method", ["Logistic", "Bifurcation"])
     st.title("Logistic Map App")
+    st.markdown("Version 1.1 : Author: Piyush Mishra : Mentor: Rajarshi Das : Updated: Jul 19, 2020")
+    st.markdown("** x(t+1) = r * x(t) * (1 - x(t)) **")
+    st.markdown("Example: Population(t+1) = Growth Rate * Population(t) * (1 - Population(t)) where Population(i) is expressed as a fraction of the maximum possible population size.")
     st.sidebar.markdown("Tunable Parameter")
-    st.write("Sample Logistic Plot")
-    x = np.linspace(0, 1)
-    fig, ax = plt.subplots(1, 1)
-    ax.plot(x, logistic(2, x), 'k')
-    st.pyplot()
-    st.write("Compare two Logistic Plot")
-    r1 = st.sidebar.number_input('Enter a r1 value',value=2.5)
-    n1 = st.sidebar.number_input('Enter a n1 value ',value=10)
-    comp_map(r1,n1)
+
+    st.header("Logistic Plot")
+    r1 = st.sidebar.number_input('Enter value of Growth Rate r : 0 < r < 4',value=2.5)
+    x0 = st.sidebar.number_input('Enter initial population size, x(0): 0 < x(0) < 1',value=0.5)
+    n1 = st.sidebar.number_input('Enter max number of iterations',value=10)
+    plot_system(r1, x0, n1)
     ## Selectbox for displaying Bifurcation plot
     method_option = st.sidebar.checkbox("Route to Chaotic",value=False)
 
     if method_option:
-        st.write("Bifurcation Plot")
+        st.header("Bifurcation Plot")
         n = st.sidebar.number_input('Number for zeros',value=1000)
         range1 = st.sidebar.number_input('Range from',value=2.5)
         range2 = st.sidebar.number_input('Range to',value=4.0)
